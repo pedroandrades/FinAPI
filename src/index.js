@@ -36,6 +36,7 @@ function getBalance(statement){
 
 app.post("/account", (request, response) => {
     const {cpf, name} = request.body;
+    const id = uuidv4();
 
     const customersAlreadyExists = customers.some((customer) => customer.cpf === cpf);
 
@@ -46,7 +47,7 @@ app.post("/account", (request, response) => {
     customers.push({
         cpf,
         name,
-        id: uuidv4,
+        id,
         statement: []
     })
 
@@ -107,6 +108,21 @@ app.get("/statement/date", verifyIfExistsAccountCPF, (request, response) => {
     const statement = customer.statement.filter((statement) => statement.created_at.toDateString() === new Date(dateFormat).toDateString())
 
     return response.json(statement);
+})
+
+
+app.put("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const {name} = request.body;
+    const {customer} = request;
+
+    customer.name = name;
+    
+    return response.status(201).send();
+})
+
+app.get("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const {customer} = request;
+    return response.json(customer);
 })
 
 app.listen(3333);
